@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="google-signin-client_id" content="37569178841-f4brk3ed8ec15vt36iodcb26c35aic8h.apps.googleusercontent.com">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title>Social Buttons for Bootstrap</title>
+
+
+    <link href="bootstrap-social.css" rel="stylesheet" >
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.css" rel="stylesheet">
+
+    <title></title>
+
+
+    <script src="https://apis.google.com/js/api.js?onload=handleClientLoad" async defer></script>
+    <script type="text/javascript" src="//platform.linkedin.com/in.js">
+        api_key: 78djlyd5zhe8dk
+        onLoad: onLinkedinLoad
+        authorize: true
+        lang: en_US
+    </script>
+
+    <script>
+
+        var auth2;
+        function handleClientLoad(){
+            console.log("loading");
+            gapi.load('client:auth2',initAuth);
+        }
+
+        function initAuth() {
+            var apiKey ="AIzaSyAzf4NtSnMRoS8rkLaS4VcNvq4r2W6J97A";
+            gapi.client.setApiKey(apiKey);
+            gapi.auth2.init({
+                client_id: "37569178841-f4brk3ed8ec15vt36iodcb26c35aic8h.apps.googleusercontent.com",
+                scope: "https://www.googleapis.com/auth/gmail.readonly"
+            }).then(function(){
+                        auth2 = gapi.auth2.getAuthInstance();
+                        console.log("auth2 :"+auth2);
+                    }
+            );
+        }
+
+        function onLinkedinLoad() {
+            var res = IN.User.isAuthorized();
+            if (res) {
+                console.log("esta Autorizado")
+                IN.Event.on(IN, "auth", getProfileData);
+            }else{
+                console.log("usuario linkedin no autorizado");
+            }
+        }
+
+        function ShowProfileData(profiles){
+            var member = profiles;
+            console.log(profiles);
+            console.log(JSON.stringify(profiles));
+            userModel.set("loggedIn",true);
+            new SearchFlightsView(userModel);
+        }
+
+        function getProfileData() {
+            console.log("getProfileData");
+            IN.API.Profile("me").result(ShowProfileData);
+        }
+
+
+
+        function signInTwitter(){
+
+            var twitterToken = new Token;
+            twitterToken.fetch({
+                success: function(model,responseJSON,options){console.log("success"),console.log("model "+JSON.stringify(model));
+                    var oauth_token = model.get("token");
+                    alert("token "+oauth_token);
+                    window.location="https://api.twitter.com/oauth/authorize?oauth_token="+oauth_token;
+                },
+                error:  function(model,responseJSON,options){alert("model: "+JSON.stringify(model));alert("json: "+JSON.stringify(responseJSON));alert("error");
+                }
+            });
+
+
+        }
+
+        function getToken(){
+
+        }
+
+        function signInGoogle(){
+            var promise = auth2.signIn();
+            promise.then(function(){
+               alert("signed in");
+                userModel.set("loggedIn",true);
+               new SearchFlightsView(userModel);
+               }
+            );
+        }
+
+        function signInLinkedin(){
+            IN.User.authorize(onLinkedinLoad());
+        }
+
+    </script>
+
+</head>
+<body >
+<p>
+<table align="center" width="300px"><tr><td>
+<div class="text-center">
+
+    <a class="btn btn-block btn-social btn-twitter" onclick="signInTwitter();">
+        <span class="fa fa-twitter"></span> Sign in with Twitter
+    </a>
+    <a class="btn btn-block btn-social btn-linkedin" onclick="signInLinkedin();">
+        <span class="fa fa-linkedin"></span> Sign in with LinkedIn
+    </a>
+    <a class="btn btn-block btn-social btn-google" onclick="signInGoogle();">
+        <span class="fa fa-google"></span> Sign in with Google
+    </a>
+</div>
+    <p>
+</td></tr></table>
+
+    <table border="0" width="100%" height="100%" >
+        <tr><td valign="middle" align="center">
+            <table border="0">
+                <tr><td></td></tr>
+                <tr><td>
+                    <table border="1" cellpadding="0" cellspacing="0">
+                        <tbody>
+                        <tr><td>
+                            <table border="0" cellpadding="0" cellspacing="0">
+                                <tbody>
+                                <tr><td width="20"></td><td height="20"></td><td width="20"></td></td><td></td><td width="20"></td></tr>
+                                <tr><td></td><td>User:</td><td width="20"></td></td><td><input type="text"></td><td></td></tr>
+                                <tr ><td></td><td height="20"> </td><td></td><td></td><td></td></tr>
+                                <tr><td></td><td>Password:</td><td></td><td><input type="password"></td><td></td></tr>
+                                <tr><td width="20"></td><td height="20"></td><td width="20"></td></td><td></td><td width="20"></td></tr>
+
+                                </tbody>
+                            </table>
+                        </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </td></tr>
+                <tr ><td height="10px"></td><td></td></tr>
+                <tr><td align="right">
+                    <table border="1"><td align="left"> <a href="as">¿Forgot Password?  </a>
+                    </td><td align="right"><button class="btnLogin">LOGIN</button></td></tr></table>
+                    </td>
+                </tr>
+            </table>
+        </td></tr>
+    </table>
+
+
+
+</body>
+</html>
+
+
+

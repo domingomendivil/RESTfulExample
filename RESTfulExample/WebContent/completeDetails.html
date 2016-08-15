@@ -1,0 +1,95 @@
+<p><p>
+
+
+    COMPLETE DETAILS
+
+
+    <p><p>
+
+
+    <table border="1" cellpadding="0" cellspacing="0">
+    <tr><td>
+        <div id="flightCompletion"></div>
+    </td><td>
+        <table border="1" cellpadding="0" cellspacing="0"><tr><td>
+        <table ><tr><td>FLIGHT SUMMARY</td></tr>
+            <tr><td>DEPARTURE:</td></tr>
+            <tr><td>FLIGHT LA 809</td></tr>
+            <tr><td>FROM MVD (Montevideo, Uruguay) </td></tr>
+            <tr><td>TO</td></tr>
+            <tr><td>MIA (Miami, USA)</td></tr>
+            <tr><td>ECONOMY</td></tr>
+        </table>
+        </td></tr></table>
+
+        <table><tr><td>PRICE/ADULT <%=totalPricexAdult%></td></tr>
+            <tr><td>x2 ADULTS</td></tr>
+            <tr><td>DISCOUNT: -30.00</td></tr>
+            <tr><td bgcolor="red" >TOTAL AMOUNT TO PAY: <%=totalPrice%></td></tr>
+        </table>
+
+    </td></tr>
+    </table>
+
+        <script>
+
+            var CreditCardView= Backbone.View.extend({
+                events: {'click .btnConfirmCheckIn': 'confirmCheckIn'},
+                el: $('#flightCompletion'),
+                initialize: function(){
+                    this.render()
+                },
+                render: function () {
+                    var that = this;
+                    $.get('creditcard.html', function (data) {
+                        template = _.template(data, {  });
+                        that.$el.html(template);
+                    }, 'html');
+                },
+                confirmCheckIn: function(){
+                    window.location="#confirmCheckIn"
+                }
+            });
+
+            var PassengersView= Backbone.View.extend({
+                events: {'click .btnConfirmCheckIn': 'confirmCheckIn'},
+                el: $('#flightCompletion'),
+                initialize: function(){
+                    this.render();
+                },
+                render: function () {
+                    var that = this;
+                    $.get('passenger.html', function (data) {
+                        template = _.template(data, {  });
+                        that.$el.html(template);
+                    }, 'html');
+                },
+                confirmCheckIn: function(){
+                    window.location="#confirmCheckIn"
+                }
+            });
+
+
+
+            var PayRouter = Backbone.Router.extend({
+//The 'routes' maps URLs with parameters to functions on your router
+                routes: {
+                    'passengers':'passengers',
+                    'creditCard': 'creditCard'
+
+                },
+
+                passengers: function(){
+                   new PassengersView();
+                },
+                creditCard: function () {
+                    new CreditCardView();
+                }
+            });
+            window.location="#passengers";
+            var aPayRouter = new PayRouter();
+
+        </script>
+
+
+<button onclick="window.location='#creditCard'">CONTINUE</button>

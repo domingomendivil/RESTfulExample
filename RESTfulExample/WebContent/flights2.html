@@ -1,0 +1,42 @@
+
+DEPARTURE:
+    <table border="1" cellpadding="0" cellspacing="0">
+        <tr><td>
+            <table>
+                <%_.each(departureFlights,function(flight){ %>
+                <tr><td>
+                    <table border="1" cellpadding="0" cellspacing="0">
+                    <tr><td><%=flight.price%></td><td><input name="departureFlight" type="radio" id="<%=flight.number%>" class="flight"> </td><td><%=flight.number%> </td><td witdh="30"><%=flight.fromAirport.iata%> </td><td><%=flight.toAirport.iata%></td><td><%=flight.fromDate%></td><td><%=flight.toDate%></td><td><%=flight.type%></td>
+                    <td><%=flight.stops%> </td></tr>
+                    </tr></table>
+                </td></tr>
+                <%} ); %>
+            </table>
+
+        </td></tr>
+    </table>
+
+<p></p>
+<p></p>
+
+RETURN:
+
+<table border="1" cellpadding="0" cellspacing="0">
+    <tr><td>
+        <table>
+            <%_.each(returnFlights,function(flight){ %>
+            <tr><td>
+                <table border="1" cellpadding="0" cellspacing="0">
+                    <tr><td><%=flight.price%></td><td><td><input name="returnFlight" type="radio" id="<%=flight.number%>" class="flight" ></td></td><td><%=flight.number%> </td><td witdh="30"><%=flight.fromAirport.iata%> </td><td><%=flight.toAirport.iata%></td><td><%=flight.fromDate%></td><td><%=flight.toDate%></td><td><%=flight.price%></td><td><%=flight.type%></td>
+                        <td><%=flight.stops%> </td></tr>
+                    </tr></table>
+            </td></tr>
+            <%} ); %>
+        </table>
+
+    </td></tr>
+</table>
+
+    <table border="0"><tr><td align="right"><button class="btnSelect">SELECT</button></td></tr></table>
+
+

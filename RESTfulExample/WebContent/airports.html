@@ -1,0 +1,19 @@
+
+    <table border="1" cellpadding="0" cellspacing="0">
+        <tr><td>
+            <table>
+                <%console.log("EN TEMPLATE "+JSON.stringify(airports)); %>
+                <%_.each(airports,function(airport){ %>
+                <tr><td>
+                    <table border="1" cellpadding="0" cellspacing="0">
+                        <tr><td><%=airport.iata%></td><td><%=airport.city.name%></td></tr>
+                        </tr></table>
+                </td></tr>
+                <%} ); %>
+            </table>
+
+        </td></tr>
+    </table>
+
+
+

@@ -1,0 +1,50 @@
+  FLIGHTS
+
+   <table border="1" cellpadding="0" cellspacing="0">
+       <tr class="col">
+       <td>Departures/Return</td>
+       <% _.each(dates,function(date){ %>
+       <td><%=date%></td>
+       <%});%>
+       </tr>
+       <% _.each(flightLines,function(flightLine){ %>
+        <tr><td class="col"><%=flightLine.from %></td>
+            <% _.each(flightLine.flightPrices,function (flightPrice){ %>
+            <td class="td"><%=flightPrice.price%></td>
+            <% } ); %>
+       <%});%>
+   </table>
+
+
+  <p> <p><p> <p>
+
+  <div id="flights2"></div>
+
+
+ <script>
+     var Flights2View = Backbone.View.extend({
+
+                 events: {
+                     'click .btnSelect': 'selectFlight',
+                     'click .td': 'displayFlight',
+                     'click .flight': 'clickFlight'
+                 },
+                 initialize: function(){
+
+                     this.render()
+                 },
+                 el: $('#flights2'),
+                 render: function () {
+                     var that = this;
+                     $.get('flights2.html', function (data) {
+                         template = _.template(data, {  });
+                         var obj = that.model.toJSON();
+                         that.$el.html(template(that.model.toJSON()));
+                     }, 'html');
+                 },
+                clickFlight: function(e){console.log(e.currentTarget.id)}
+             }
+     );
+
+ </script>
+

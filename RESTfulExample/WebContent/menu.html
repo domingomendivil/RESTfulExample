@@ -1,0 +1,24 @@
+<table width="100%"><tr><td>
+<nav>
+    <a onclick="new SearchFlightsView()">BOOK A FLIGHT</a>
+    <a onclick="new BookingSearchView()">CHECK IN</a>
+    <a onclick="new BookingSearchView()">CANCEL BOOKING</a>
+    <a onclick="new BookingSearchView()">TICKET DETAILS</a>
+</nav>
+</td>
+<td align="right">
+    <%if (loggedIn==true) {%>
+    <div class="dropdown">
+        <button class="dropbtn">Welcome <%=firstName%></button>
+        <div class="dropdown-content">
+            <a href="#">Account Settings</a>
+            <a id="signOut" href="">Sign Out</a>
+        </div>
+    </div>
+    <%}else { %>
+    <nav>
+    <a onclick="new LoginView()">SIGN IN</a>
+    <%} %>
+    </nav>
+</td>
+</tr></table>

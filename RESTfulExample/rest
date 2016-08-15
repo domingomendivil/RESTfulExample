@@ -1,0 +1,16 @@
+GET http://localhost:8080/api/v1/bookings/23145
+
+GET http://localhost:8080/api/v1/flights/search?xxxx
+
+POST http://localhost:8080/api/v1/bookings/123124/cancel
+
+POST http://localhost:8080/api/v1/bookings/123124/checkIn
+
+POST http://localhost:8080/api/v1/flights/book
+
+POST http://localhost:8080/api/v1/bookings/12312
+
+
+
+
+

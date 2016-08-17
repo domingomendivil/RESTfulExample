@@ -14,8 +14,8 @@ import com.airport.domain.CheckInInformation;
 import com.airport.domain.ETicket;
 import com.airport.domain.FlightSearch;
 import com.airport.domain.Passenger;
-import com.airport.rest.external.PaymentAPI;
-import com.airport.rest.external.ReservationGateway;
+import com.airport.payments.PaymentAPI;
+import com.airport.reservations.ReservationGateway;
 
 
 public class APIImplTest {

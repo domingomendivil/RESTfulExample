@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 
+import com.airport.dao.DAO;
 import com.airport.domain.AccountInformation;
 import com.airport.domain.Airport;
 import com.airport.domain.BoardingPass;
@@ -17,8 +18,13 @@ import com.airport.domain.FlightSearch;
 import com.airport.domain.Payment;
 import com.airport.domain.Seat;
 import com.airport.domain.Status;
-import com.airport.rest.external.PaymentAPI;
-import com.airport.rest.external.ReservationGateway;
+import com.airport.domain.User;
+import com.airport.email.EMail;
+import com.airport.payments.PaymentAPI;
+import com.airport.pdf.PDFPrinter;
+import com.airport.reservations.ReservationGateway;
+import com.airport.security.Authorizator;
+import com.airport.security.NotAuthorizedException;
 
 public class APIImpl implements API {
 	
@@ -27,14 +33,15 @@ public class APIImpl implements API {
 	private PaymentAPI paymentAPI;
 	private ReservationGateway reservationGateway;
 	private PDFPrinter pdfPrinter;
+	private Authorizator authorizator;
 	
-	
-	public APIImpl(DAO dao,EMail email,PaymentAPI paymentAPI,ReservationGateway reservationGateway,PDFPrinter printer){
+	public APIImpl(DAO dao,EMail email,PaymentAPI paymentAPI,ReservationGateway reservationGateway,Authorizator authorizator,PDFPrinter printer){
 		this.dao=dao;
 		this.email=email;
 		this.paymentAPI=paymentAPI;
 		this.reservationGateway=reservationGateway;
 		this.pdfPrinter=printer;
+		this.authorizator=authorizator;
 	}
 
 	@Override
@@ -96,11 +103,7 @@ public class APIImpl implements API {
 		
 	}
 
-	@Override
-	public void signIn(String user, String password) throws APIException {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	@Override
 	public void signOut(String token) throws APIException {
@@ -108,11 +111,6 @@ public class APIImpl implements API {
 		
 	}
 
-	@Override
-	public AccountInformation getAccountInformation(String token) throws APIException {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public List<Flight> getFlights(FlightSearch flightSearch) throws APIException {
@@ -156,6 +154,27 @@ public class APIImpl implements API {
 	
 	private Booking getBooking(String code) {
 		return reservationGateway.getBooking(code);
+	}
+
+	@Override
+	public boolean signIn(String authorization) {
+		try {
+			authorizator.validateAccess(authorization);
+			return true;
+		} catch (NotAuthorizedException e) {
+			return false;
+		}
+	}
+
+	@Override
+	public AccountInformation getAccountInformation(String authorization) throws NotAuthorizedException{
+		authorizator.validateAccess(authorization);
+		AccountInformation accountInfo = new AccountInformation();
+		String userId = authorizator.getUserFromAuthorization(authorization);
+		User user = (User)dao.getbyId(User.class,userId);
+		accountInfo.setId(userId);
+		return accountInfo;
+		
 	}	
 	
 	

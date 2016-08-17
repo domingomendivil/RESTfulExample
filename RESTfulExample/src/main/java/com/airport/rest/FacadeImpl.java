@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -19,6 +20,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import com.airport.dao.DAO;
+import com.airport.dao.DAOImpl;
 import com.airport.domain.AccountInformation;
 import com.airport.domain.Airport;
 import com.airport.domain.AirportList;
@@ -41,6 +44,10 @@ import com.airport.domain.Status;
 import com.airport.domain.Token;
 import com.airport.domain.TwitterToken;
 import com.airport.domain.User;
+import com.airport.email.EMail;
+import com.airport.email.EMailImpl;
+import com.airport.factory.Factory;
+import com.airport.security.NotAuthorizedException;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -56,10 +63,7 @@ public class FacadeImpl  {
 	private EMail email = new EMailImpl();
 	
 	
-	
-	public FacadeImpl(){
-		
-	}
+	private API api = new Factory().getAPI();
 	
 	
 	@SuppressWarnings("unchecked")
@@ -209,16 +213,10 @@ public class FacadeImpl  {
 		return null;
 	}
 
-	public Token signIn(String userName, String password) {
-		// TODO Auto-generated method stub
-		String encryptedPassword = encrypt(password); 
-		User user = getUser(userName);
-		System.out.println(user);
-		if (user.getPassword().equals(encryptedPassword)){
-			return generateToken(userName);
-		}else{
-			return null;	
-		}
+	@GET
+	@Path("/login")
+	public boolean signIn(@HeaderParam("Authorization")String authorization) {
+		return api.signIn(authorization);
 	}
 
 	private Token generateToken(String userName) {
@@ -334,10 +332,17 @@ public class FacadeImpl  {
 	}
 
 
-
-	public void addAccountInformation(Token token, AccountInformation accountInfo) {
-		// TODO Auto-generated method stub
-
+	
+	@GET
+	@Path("/profile")
+	@Produces(MediaType.APPLICATION_JSON)
+	public AccountInformation getAccountInformation(@HeaderParam("Authorization") String authorization){
+		try {
+			AccountInformation accountInfo = api.getAccountInformation(authorization);
+			return accountInfo;
+		} catch (NotAuthorizedException e) {
+			return null;
+		}
 	}
 
 
@@ -377,7 +382,6 @@ public class FacadeImpl  {
 	}
 	
 	private static AccessToken getAccessToken() throws TwitterException{
-		
 		Twitter twitter = new TwitterFactory().getInstance();
 		System.setProperty("twitter4j.oauth.consumerKey","jiOMFZ9CDxEGqEYZCHv2hJGKs");
 		System.setProperty("twitter4j.oauth.consumerSecret","R7zqjCDmbXPXlSTAy0A7SzXvAxMhOjY1jgw5rwAmYcJhU730JQ");

@@ -1,7 +1,14 @@
 package com.airport.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name="staff_users")
 public class StaffUser {
 	
+	@Id
 	private String id;
 	private String firstName;
 	private String lastName1;

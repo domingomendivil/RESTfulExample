@@ -1,9 +1,13 @@
 package com.airport.domain;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -24,9 +28,23 @@ public class User {
 	private String phoneNumber;
 	private String frequentFlyerId;
 	private Date createdDate;
+	public List<SocialLogin> getSocialLogins() {
+		return socialLogins;
+	}
+	public void setSocialLogins(List<SocialLogin> socialLogins) {
+		this.socialLogins = socialLogins;
+	}
+	public void setLastName1(String lastName1) {
+		this.lastName1 = lastName1;
+	}
 	private Date activatedDate; 
 	private Address livingAddress;
 	private boolean activated;
+	
+	@OneToMany
+	@JoinTable(name = "sociallogins",joinColumns = @JoinColumn(name = "email"),
+    inverseJoinColumns = @JoinColumn(name = "user"))
+	private List<SocialLogin> socialLogins; 
 
 	
 	public String getPassword() {

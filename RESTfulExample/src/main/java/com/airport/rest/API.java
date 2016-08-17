@@ -12,6 +12,7 @@ import com.airport.domain.Flight;
 import com.airport.domain.FlightSearch;
 import com.airport.domain.Payment;
 import com.airport.domain.Seat;
+import com.airport.security.NotAuthorizedException;
 
 import twitter4j.auth.Authorization;
 
@@ -79,14 +80,13 @@ public interface API {
 	public void makePayment(Payment payment) throws APIException;
 	
 	
-	public void signIn(Authorization authorization) throws APIException;
-	
+	public boolean signIn(String authorization);
 	
 	
 	public void signOut(String token) throws APIException;
 	
 	
-	public AccountInformation getAccountInformation(String authorization,String token) throws NotAuthorizedException,APIException;
+	public AccountInformation getAccountInformation(String authorization) throws NotAuthorizedException;
 	
 	
 	public List<Flight> getFlights(FlightSearch flightSearch) throws APIException;

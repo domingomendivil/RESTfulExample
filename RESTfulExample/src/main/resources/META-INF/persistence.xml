@@ -16,6 +16,8 @@
         <class>com.airport.domain.Flight</class>
         <class>com.airport.domain.ETicket</class>
         <class>com.airport.domain.BoardingPass</class>
+        <class>com.airport.domain.StaffUser</class>
+        <class>com.airport.domain.SocialLogin</class>
           <properties>
    		 	<property name="openjpa.ConnectionURL" 
                 value="jdbc:mysql://localhost:3306/airport"/>

@@ -1,41 +1,45 @@
-package com.airport.rest;
+package com.airport.publicapi;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import com.airport.dao.DAO;
 import com.airport.domain.AccountInformation;
 import com.airport.domain.Airport;
+import com.airport.domain.AvailableFlights;
 import com.airport.domain.BoardingPass;
 import com.airport.domain.Booking;
 import com.airport.domain.CheckInInformation;
 import com.airport.domain.Country;
 import com.airport.domain.ETicket;
-import com.airport.domain.Flight;
+import com.airport.domain.ETicketStatus;
 import com.airport.domain.FlightSearch;
+import com.airport.domain.FlightSummary;
 import com.airport.domain.Payment;
 import com.airport.domain.Seat;
-import com.airport.domain.Status;
 import com.airport.domain.User;
-import com.airport.email.EMail;
+import com.airport.email.EmailSender;
+import com.airport.exceptions.OperationException;
+import com.airport.exceptions.ObjectNotFoundException;
 import com.airport.payments.PaymentAPI;
 import com.airport.pdf.PDFPrinter;
-import com.airport.reservations.ReservationGateway;
+import com.airport.reservations.ReservationAPI;
 import com.airport.security.Authorizator;
 import com.airport.security.NotAuthorizedException;
 
-public class APIImpl implements API {
+public class PublicApiImpl implements PublicApi {
 	
 	private DAO dao;
-	private EMail email;
+	private EmailSender email;
 	private PaymentAPI paymentAPI;
-	private ReservationGateway reservationGateway;
+	private ReservationAPI reservationGateway;
 	private PDFPrinter pdfPrinter;
 	private Authorizator authorizator;
 	
-	public APIImpl(DAO dao,EMail email,PaymentAPI paymentAPI,ReservationGateway reservationGateway,Authorizator authorizator,PDFPrinter printer){
+	public PublicApiImpl(DAO dao,EmailSender email,PaymentAPI paymentAPI,ReservationAPI reservationGateway,Authorizator authorizator,PDFPrinter printer){
 		this.dao=dao;
 		this.email=email;
 		this.paymentAPI=paymentAPI;
@@ -45,60 +49,57 @@ public class APIImpl implements API {
 	}
 
 	@Override
-	public boolean cancelBooking(String code, String lastName) {
+	public boolean cancelBooking(String code, String lastName) throws ObjectNotFoundException {
+		
 		Booking booking = getBooking(code);
 		if (verifyLastName(booking,lastName)){
-			dao.begin();
-			booking.setStatus(Status.cancelled);
-			dao.commit();
-			try {
+			boolean cancelled= reservationGateway.cancelBooking(code);
+			if (cancelled){
 				sendEmailCancelledBooking(booking);
-			} catch (IOException e) {
-				e.printStackTrace();
+				return true;
+			}else{
+				return false;
 			}
-			return true;
+				
 		}else{
 			return false;
 		}
 	}
 
 	@Override
-	public Booking getBooking(String code, String lastName) throws APIException {
+	public Booking getBooking(String code, String lastName) throws ObjectNotFoundException {
 		Booking booking = getBooking(code);
 		if (verifyLastName(booking, lastName)){
 			return booking;	
 		}else{
-			throw new APIException("Booking not found");
+			throw new ObjectNotFoundException("Booking not found");
 		}
 		
 	}
 
 	@Override
-	public List<BoardingPass> checkIn(CheckInInformation checkIn) throws APIException {
+	public List<BoardingPass> checkIn(CheckInInformation checkIn) throws OperationException {
 		return reservationGateway.checkIn(checkIn);
 		
 	}
 
 	@Override
-	public List<Airport> getAirports(String beginLetters) throws APIException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Airport> getAirports(String beginLetters) throws ObjectNotFoundException {
+		return reservationGateway.getAirports(beginLetters);
 	}
 
 	@Override
-	public List<Country> getCountries() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Country> getCountries() throws ObjectNotFoundException {
+		return reservationGateway.getCountries();
 	}
 
 	@Override
-	public List<Seat> getSeats(Integer flightId) throws APIException {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Seat> getSeats(String flightId) throws  ObjectNotFoundException {
+		 return reservationGateway.getSeats(flightId);
 	}
 
 	@Override
-	public void makePayment(Payment payment) throws APIException {
+	public void makePayment(Payment payment) throws OperationException {
 		// TODO Auto-generated method stub
 		
 	}
@@ -106,22 +107,20 @@ public class APIImpl implements API {
 	
 
 	@Override
-	public void signOut(String token) throws APIException {
+	public void signOut(String token) {
 		// TODO Auto-generated method stub
 		
 	}
 
 
 	@Override
-	public List<Flight> getFlights(FlightSearch flightSearch) throws APIException {
+	public AvailableFlights getFlights(FlightSearch flightSearch) throws ObjectNotFoundException {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	private void sendEmailCancelledBooking(Booking booking) throws IOException {
-		String file = readFile("canceEmail");
-		file.replaceAll("<%=booking.code%>",booking.getCode());
-		email.sendEmail(file);
+	private void sendEmailCancelledBooking(Booking booking)  {
+		email.sendBookingCancelled(booking);
 	}
 
 	private boolean verifyLastName(Booking booking,String lastName) {
@@ -152,7 +151,7 @@ public class APIImpl implements API {
 	}
 	
 	
-	private Booking getBooking(String code) {
+	private Booking getBooking(String code) throws ObjectNotFoundException {
 		return reservationGateway.getBooking(code);
 	}
 
@@ -175,7 +174,44 @@ public class APIImpl implements API {
 		accountInfo.setId(userId);
 		return accountInfo;
 		
-	}	
+	}
+
+	@Override
+	public List<Booking> getBookings(String authorization) throws NotAuthorizedException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public FlightSummary getFlightSummary(FlightSearch flightSearch) throws ObjectNotFoundException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public ETicket getETicket(String code, String lastName) {
+		// TODO Auto-generated method stub
+		return null;
+		
+	}
+
+	@Override
+	public BoardingPass confirmCheckIn(String code, String lastName, CheckInInformation checkInInformation) throws ObjectNotFoundException {
+		Booking booking = getBooking(code);
+		ETicket eTicket = getETicket(code, lastName);
+		if (eTicket!=null){
+			eTicket.setStatus(ETicketStatus.checkedIn);
+			eTicket.setBooking(booking);
+			BoardingPass boardingPass = new BoardingPass();
+			boardingPass.seteTicket(eTicket);
+			boardingPass.setBoardingTime(new Date());
+			return boardingPass;
+		}else{
+			return null;
+		}
+	}
+
+
 	
 	
 	
